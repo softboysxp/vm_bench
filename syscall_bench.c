@@ -29,6 +29,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #include "bench_op.h"
 
@@ -67,5 +68,9 @@ int main(int argc, char *argv[]) {
 	BENCH_OP(getuid);
 	BENCH_OP(getgid);
 	BENCH_OP(fork_parent);
+
+	for (int i = 0; i < iter; i++) {
+		wait(NULL);
+	}
 }
 
