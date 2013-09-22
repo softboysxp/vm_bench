@@ -29,7 +29,6 @@
 #include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <sys/wait.h>
 
 #include "bench_op.h"
 
@@ -38,8 +37,6 @@ static int iter = 1000000;
 static inline void fork_parent() {
 	if (!fork()) {
 		exit(0);
-	} else {
-		wait(NULL);
 	}
 }
 

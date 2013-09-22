@@ -36,7 +36,7 @@
 
 #include "bench_op.h"
 
-#define MSG_LEN 512
+#define MSG_LEN 4096
 
 static int iter = 1000000;
 static pid_t child = -1;
@@ -50,11 +50,20 @@ static inline void ipc_bench_signal() {
 	wait(NULL);
 }
 
-static inline void ipc_bench_pipe() {
+static inline void ipc_bench_pipe_0() {
+	write(fds[1], msg, 0);
+}
+
+static inline void ipc_bench_pipe_4k() {
 	write(fds[1], msg, MSG_LEN);
 }
 
-static inline void ipc_bench_socket() {
+static inline void ipc_bench_socket_0() {
+	write(client_sock, msg, 0);
+	read(client_sock, msg, 0);
+}
+
+static inline void ipc_bench_socket_4k() {
 	write(client_sock, msg, MSG_LEN);
 	read(client_sock, msg, MSG_LEN);
 }
@@ -101,12 +110,18 @@ int main(int argc, char *argv[]) {
 	pid = fork();
 	if (pid > 0) {
 		close(fds[0]);
-		BENCH_OP(ipc_bench_pipe);
+		BENCH_OP(ipc_bench_pipe_0);
+		BENCH_OP(ipc_bench_pipe_4k);
 		close(fds[1]);
 		wait(NULL);
 	} else if (pid == 0) {
 		close(fds[1]);
-		while (read(fds[0], msg, MSG_LEN)) ;
+		for (int i = 0; i < iter; i++) {
+			read(fds[0], msg, 0);
+		}
+		for (int i = 0; i < iter; i++) {
+			read(fds[0], msg, MSG_LEN);
+		}
 		close(fds[0]);
 		exit(0);
 	} else {
@@ -143,7 +158,8 @@ int main(int argc, char *argv[]) {
 			return -1;
 		}
 
-		BENCH_OP(ipc_bench_socket);
+		BENCH_OP(ipc_bench_socket_0);
+		BENCH_OP(ipc_bench_socket_4k);
 
 		close(client_sock);
 		close(sock);
@@ -171,7 +187,13 @@ int main(int argc, char *argv[]) {
 			perror("connect timeout");
 		}
 
-		while (read(sock, msg, MSG_LEN) > 0) {
+		for (int i = 0; i < iter; i++) {
+			read(sock, msg, 0);
+			write(sock, msg, 0);
+		}
+
+		for (int i = 0; i < iter; i++) {
+			read(sock, msg, MSG_LEN);
 			write(sock, msg, MSG_LEN);
 		}
 
