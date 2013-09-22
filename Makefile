@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -std=c99 -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lrt
+LDFLAGS = -lrt -lpthread
 
 ifdef DEBUG
 	CFLAGS += -DDEBUG -O0 -g
