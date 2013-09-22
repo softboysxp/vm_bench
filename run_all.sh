@@ -7,6 +7,9 @@ ITER=$1
 rm -rf $LOG_DIR
 mkdir -p $LOG_DIR
 
+cat /proc/cpuinfo > $LOG_DIR/cpuinfo
+cat /proc/meminfo > $LOG_DIR/meminfo
+
 for I in `seq 1 $ITER`; do
 	echo -e '\E[37;44m'"\033[1mRun $I/$ITER\033[0m"
 	./syscall_bench -i 10000 | tee -a $LOG_DIR/syscall_bench.log
