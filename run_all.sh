@@ -15,10 +15,19 @@ for I in `seq 1 $ITER`; do
 	./syscall_bench -i 10000 | tee -a $LOG_DIR/syscall_bench.log
 	./vm_bench -i 10000 | tee -a $LOG_DIR/vm_bench.log
 	./io_bench -f `mktemp -u` -s 262144 | tee -a $LOG_DIR/io_bench.log
+
+	# EC2 instance storage
 	if [ -b "/dev/xvdb" ]; then
 		./io_bench -f /mnt/io_bench.local -s 262144 | tee -a $LOG_DIR/io_bench_local.log
 		rm -f /mnt/io_bench.local
 	fi
+
+	# Azure instance storage
+	if [ -b "/dev/sdb1" ]; then
+		./io_bench -f /mnt/resource/io_bench.local -s 262144 | tee -a $LOG_DIR/io_bench_local.log
+		rm -f /mnt/resource/io_bench.local
+	fi
+
 	./pthreads_bench -i 10000 | tee -a $LOG_DIR/pthreads_bench.lgo
 	./ipc_bench -i 10000 | tee -a $LOG_DIR/ipc_bench.log
 done
