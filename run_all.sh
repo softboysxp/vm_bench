@@ -28,7 +28,7 @@ for I in `seq 1 $ITER`; do
 		rm -f /mnt/resource/io_bench.local
 	fi
 
-	./pthreads_bench -i 10000 | tee -a $LOG_DIR/pthreads_bench.lgo
+	./pthreads_bench -i 10000 | tee -a $LOG_DIR/pthreads_bench.log
 	./ipc_bench -i 10000 | tee -a $LOG_DIR/ipc_bench.log
 done
 
