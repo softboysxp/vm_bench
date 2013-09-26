@@ -46,8 +46,7 @@ static int sock = -1, client_sock = -1;
 static const char *sock_path = "/tmp/ipc_bench.sock";
 
 static inline void ipc_bench_signal() {
-	kill(child, SIGTERM);
-	wait(NULL);
+	kill(child, SIGUSR1);
 }
 
 static inline void ipc_bench_pipe_0() {
@@ -91,10 +90,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	signal(SIGUSR1, SIG_IGN);
 	pid_t pid = fork();
 	if (pid > 0) {
 		child = pid;
 		BENCH_OP(ipc_bench_signal);
+		kill(child, SIGTERM);
+		wait(NULL);
 	} else if (pid == 0) {
 		// wait to be killed	
 	} else {
