@@ -27,3 +27,8 @@ run: $(BINS)
 clean:
 	rm -f $(BINS)
 
+zip: archive
+
+archive:
+	git archive --prefix=vm_bench/ --format zip -9 HEAD > vm_bench-`git log -1 --format='%h'`.zip
+
