@@ -44,11 +44,26 @@ static int page_size = 0;
 static void *temp_page = NULL;
 static void *temp_buf = NULL;
 
+#ifdef __APPLE__
+	static const int sig_seg_v = SIGBUS; // on OS X a bus error occurs instead of seg fault
+#else
+	static const int sig_seg_v = SIGSEGV;
+#endif
+
 static inline void vm_bench_mmap() {
+#ifdef __APPLE__
+	temp_page = mmap(NULL, page_size,
+					 PROT_READ | PROT_WRITE,
+					 MAP_PRIVATE | MAP_ANON,
+					 -1, 0);
+	mlock(temp_page, page_size);
+#else
 	temp_page = mmap(NULL, page_size,
 					 PROT_READ | PROT_WRITE,
 					 MAP_PRIVATE | MAP_ANONYMOUS | MAP_LOCKED | MAP_POPULATE,
 					 -1, 0);
+#endif
+
 #ifdef DEBUG
 	assert(temp_page > 0);
 #endif
@@ -64,7 +79,7 @@ static inline void vm_bench_copy() {
 
 void seg_fault_handler(int sig) {
 #ifdef DEBUG
-	assert(sig == SIGSEGV);
+	assert(sig == sig_seg_v);
 #endif
 
 	mprotect(temp_page, page_size, PROT_READ | PROT_WRITE);
@@ -119,9 +134,9 @@ int main(int argc, char *argv[]) {
 	BENCH_OP(vm_bench_copy);
 	free(temp_buf);
 
-	signal(SIGSEGV, seg_fault_handler);
+	signal(sig_seg_v, seg_fault_handler);
 	BENCH_OP(vm_bench_seg_fault_handler);
-	signal(SIGSEGV, SIG_DFL);
+	signal(sig_seg_v, SIG_DFL);
 
 	BENCH_OP(vm_bench_munmap);
 }

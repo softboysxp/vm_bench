@@ -43,9 +43,13 @@ static size_t total_size = (1UL << 30);
 static const char *temp_filename = NULL;
 
 void clear_temp_buffer_cache() {
+#ifdef __APPLE__
+	system("purge"); // ugly but easiest way.
+#else
 	int fd = open("/proc/sys/vm/drop_caches", O_WRONLY);
 	write(fd, "3", 1);
 	close(fd);
+#endif
 }
 
 static inline void io_bench_write() {

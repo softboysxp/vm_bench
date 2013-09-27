@@ -1,11 +1,16 @@
 CC = clang
-CFLAGS = -std=c99 -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lrt -lpthread
+CFLAGS = -std=c99 -D_BSD_SOURCE
+LDFLAGS = -lpthread
+
+ifneq "$(shell uname)" "Darwin"
+	LDFLAGS += -lrt
+	CFLAGS += -D_POSIX_C_SOURCE=200809L
+endif
 
 ifdef DEBUG
 	CFLAGS += -DDEBUG -O0 -g
 else
-	CFLAGS += -O3
+	CFLAGS += -O3 -Wall
 endif
 
 BINS = syscall_bench vm_bench io_bench pthreads_bench ipc_bench

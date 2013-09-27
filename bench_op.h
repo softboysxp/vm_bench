@@ -26,8 +26,29 @@
 #ifndef BENCH_OP_H
 #define BENCH_OP_H
 
-#include <time.h>
 #include <stdint.h>
+
+#ifdef __APPLE__
+
+#include <mach/mach_time.h>
+
+#define BENCH_OP(func) { \
+	mach_timebase_info_data_t timebase_info; \
+	mach_timebase_info(&timebase_info); \
+	uint64_t start, end; \
+	start = mach_absolute_time(); \
+	for (int i = 0; i < iter; i++) { \
+		func(); \
+	} \
+	end = mach_absolute_time(); \
+	uint64_t total_ns = (end - start) * timebase_info.numer / timebase_info.denom; \
+	printf("%s: %.3f ns\n", #func, 1.0 * total_ns / iter); \
+	fflush(stdout); \
+}
+
+#else
+
+#include <time.h>
 
 #define BENCH_OP(func) { \
 	struct timespec ts_start, ts_end; \
@@ -40,6 +61,8 @@
 	printf("%s: %.3f ns\n", #func, 1.0 * total_ns / iter); \
 	fflush(stdout); \
 }
+
+#endif //__APPLE__
 
 #endif //BENCH_OP_H
 
