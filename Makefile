@@ -31,6 +31,8 @@ run: $(BINS)
 
 clean:
 	rm -f $(BINS)
+	rm -f *.zip
+	rm -rf *.dSYM
 
 zip: archive
 
