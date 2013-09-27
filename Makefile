@@ -2,7 +2,7 @@ CC = clang
 CFLAGS = -std=c99 -D_BSD_SOURCE
 LDFLAGS = -lpthread
 
-ifneq "$(shell uname)" "Darwin"
+ifeq "$(shell uname)" "Linux"
 	LDFLAGS += -lrt
 	CFLAGS += -D_POSIX_C_SOURCE=200809L
 endif

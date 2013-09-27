@@ -51,7 +51,7 @@ static void *temp_buf = NULL;
 #endif
 
 static inline void vm_bench_mmap() {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__FreeBSD__)
 	temp_page = mmap(NULL, page_size,
 					 PROT_READ | PROT_WRITE,
 					 MAP_PRIVATE | MAP_ANON,

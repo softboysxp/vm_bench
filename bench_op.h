@@ -50,6 +50,10 @@
 
 #include <time.h>
 
+#ifndef CLOCK_MONOTONIC_RAW
+	#define CLOCK_MONOTONIC_RAW CLOCK_MONOTONIC
+#endif
+
 #define BENCH_OP(func) { \
 	struct timespec ts_start, ts_end; \
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts_start); \
